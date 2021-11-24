@@ -27,9 +27,9 @@ This widget displays a variable sized widget of an analog clock. The clock face 
 
 The Hour, Minute and Seconds clock hands are drawn by the widget and updated every second.
 
-The colour of the hands can be changed as required.
+The colour of the hands can be changed as required. Note the black border is NOT part of the widget.
 
-<img src="/home/stuart/git/golang/fyne-widget-example/fyne-clock-widget.png" style="zoom:33%;" />
+![fyne-clock-widget](https://user-images.githubusercontent.com/94919638/143290347-2a0f5f1c-7015-4a00-b994-72b17e272ee1.png)
 
 ```go
 func main() {
