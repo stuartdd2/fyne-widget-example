@@ -7,22 +7,24 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var aClock *WidgetClock
-var aButton *widget.Button
-
 func main() {
-	ShowWidgetClock()
+	ShowWidgetClockInContainer()
 }
 
+func ShowWidgetClockInContainer() {
+	app := app.New()
+	aWindow := app.NewWindow("Widget Clock")
+	clock := NewWidgetClock(10, canvas.NewImageFromFile("clock2.svg"), 100, 100, true)
+	aButton := widget.NewButton("Stop/Start", func() {
+		clock.SetRunning(!clock.GetRunning())
+	})
+	aWindow.SetContent(container.NewBorder(aButton, nil, nil, nil, clock))
+	aWindow.ShowAndRun()
+}
 func ShowWidgetClock() {
 	app := app.New()
 	aWindow := app.NewWindow("Widget Clock")
-	aClock = NewWidgetClock(10, canvas.NewImageFromFile("clock2.svg"), 100, 100)
-	aButton = widget.NewButton("Stop/Start", func() {
-		aClock.SetRunning(!aClock.GetRunning())
-	})
-
-	aWindow.SetContent(container.NewBorder(aButton, nil, nil, nil, aClock))
-	aClock.SetRunning(true)
+	clock := NewWidgetClock(10, canvas.NewImageFromFile("clock2.svg"), 100, 100, true)
+	aWindow.SetContent(clock)
 	aWindow.ShowAndRun()
 }

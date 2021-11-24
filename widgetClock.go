@@ -29,26 +29,32 @@ const (
 // If you break the widget implementation of an interface
 // the respective line below will indicate an error.
 // This is really usefull for widget development
+//   Note that for the Widget itself it will conform to
+//   fyne.Widget because of widget.BaseWidget in the struct.
 //
-var _ fyne.WidgetRenderer = (*widgetClockRenderer)(nil)
-var _ fyne.CanvasObject = (*WidgetClock)(nil)
-var _ fyne.Widget = (*WidgetClock)(nil)
-var _ fyne.Tappable = (*WidgetClock)(nil)
-var _ fyne.SecondaryTappable = (*WidgetClock)(nil)
+var _ fyne.Widget = (*WidgetClock)(nil)                 // Test WidgetClock is a fyne.Widget
+var _ fyne.WidgetRenderer = (*widgetClockRenderer)(nil) // Test widgetClockRenderer is a fyne.fyne.WidgetRenderer
+var _ fyne.CanvasObject = (*WidgetClock)(nil)           // Test WidgetClock is a fyne.CanvasObject
+var _ fyne.Tappable = (*WidgetClock)(nil)               // Test WidgetClock is a fyne.Tappable
+var _ fyne.SecondaryTappable = (*WidgetClock)(nil)      // Test WidgetClock is a fyne.SecondaryTappable
 
 //
-// The Renderer (fyne.WidgetRenderer interface) is responsible for ALL
-// drawing, scaling, moving, animating etc
+// The Renderer (fyne.WidgetRenderer interface) is responsible for ALL drawing, scaling, moving, animating etc.
+// Animation here is where we move the clock hands. This is done with a time.NewTicker not a fyne.Animator.
+//
+// Note h,m,s would usually be the responsibility of the Widget. Each is state information.
+//      However, as these are updated by the Ticker and the Ticker is in the Renderer (for simplicity)
+//      it is more logical to store them here.
 //
 type widgetClockRenderer struct {
-	widget     *WidgetClock      // Reference to the widget so we can access state information
+	widget     *WidgetClock      // Reference to the widget so the renderer can access clock state information
 	size       fyne.Size         // The current size of the widget. Set when Layout is called
 	background *canvas.Rectangle // A rectangle that forms the background
 	centCirc   *canvas.Circle    // A circle at the center of the clock dispay
 	sHand      *canvas.Line      // The second hand
 	mHand      *canvas.Line      // The minute hand
 	hHand      *canvas.Line      // The hour hand
-	h, m, s    int               // The hour, minute and second currently shown
+	h, m, s    int               // The hour, minute and second currently shown.
 }
 
 func newWidgetClockRenderer(w *WidgetClock) *widgetClockRenderer {
@@ -59,28 +65,33 @@ func newWidgetClockRenderer(w *WidgetClock) *widgetClockRenderer {
 			FillColor: w.BackgroundColor,
 		},
 	}
+	// Init the image to fill and keep it's aspect ratio
 	r.widget.Image.FillMode = canvas.ImageFillContain
-	r.mHand = canvas.NewLine(r.widget.MHandColor)
+	// Create the canvas objects according to the state of the widget
+	r.mHand = canvas.NewLine(w.MHandColor)
 	r.mHand.StrokeWidth = 3
-	r.hHand = canvas.NewLine(r.widget.HHandColor)
+	r.hHand = canvas.NewLine(w.HHandColor)
 	r.hHand.StrokeWidth = 3
-	r.sHand = canvas.NewLine(r.widget.SHandColor)
+	r.sHand = canvas.NewLine(w.SHandColor)
 	r.sHand.StrokeWidth = 1
-	r.centCirc = canvas.NewCircle(r.widget.CenterColor)
+	r.centCirc = canvas.NewCircle(w.CenterColor)
 	// Update the time at the start
 	r.updateTime()
 	//
-	// Start the bacground animation. One process per second
+	// Start the bacground animation using the Ticker.
+	//  One process per second.
 	//
 	tick := time.NewTicker(time.Second)
 	go func() {
-		// Run forever in the background
+		// Run forever in the background.
+		// This code is NOT run when the widget is constructed.
+		// It is run after and then after each second
 		for {
-			// If running updatethe time
+			// If running update the time
 			if r.widget.running {
 				r.updateTime()
 			}
-			// Lay everything out
+			// Lay everything out using the minimum size
 			r.Layout(r.size)
 			// Redraw the widget
 			canvas.Refresh(r.widget)
@@ -93,8 +104,8 @@ func newWidgetClockRenderer(w *WidgetClock) *widgetClockRenderer {
 }
 
 //
-// From the WidgetRenderer interface.
-// For the given size. Layout (rearrange) all of the visible components.
+// Layout: From the WidgetRenderer interface.
+// For the given size 's'. Layout (re-arrange) all of the visible components.
 // This also updates the position of the clock hands.
 //
 func (r *widgetClockRenderer) Layout(s fyne.Size) {
@@ -163,7 +174,7 @@ func (r *widgetClockRenderer) Refresh() {}
 //
 // From the WidgetRenderer interface.
 // Return a list of CanvasObjects that will require display (rendering)
-// The order is critical. The last object in the list is the lat to be drawn
+// The order is critical. The last object in the list is the last to be drawn
 //
 func (r *widgetClockRenderer) Objects() []fyne.CanvasObject {
 	o := make([]fyne.CanvasObject, 0)
@@ -202,20 +213,20 @@ func hourToClock60(hr, min int) int {
 
 //
 // The are 60 positions corresponding to 360 degrees on the clock face.
-// Given the position and length we use trigonometry to derive the end of the line
+// Given the position and length we use trigonometry to derive the end point of the line
 //    x = len * cos(theta)
 //    y = len * sin(theta)
-// The start of the line is the center of the clock face .
-//   Note the math api uses float64 but every thing else is in float32 so
+// The start point of the line is the center of the clock face .
+//   Note the math API uses float64 but every thing else uses float32 so
 //   some conversion must take place.
 //   Radians (float64) are used by math Cos and Sine functions.
 //
 func (r *widgetClockRenderer) updateClockHand(cent fyne.Position, lineLen float32, position int, line *canvas.Line) {
 	radians := (float64((position*DEG_PER_TICK_INT)-90) * PI_180_F64)
-	xx := cent.X + lineLen*float32(math.Cos(radians))
-	yy := cent.Y + lineLen*float32(math.Sin(radians))
+	xEnd := cent.X + lineLen*float32(math.Cos(radians))
+	yExd := cent.Y + lineLen*float32(math.Sin(radians))
 	line.Position1 = cent
-	line.Position2 = fyne.Position{X: xx, Y: yy}
+	line.Position2 = fyne.Position{X: xEnd, Y: yExd}
 }
 
 //
@@ -239,17 +250,19 @@ type WidgetClock struct {
 //
 // Create a Clock Widget and Extend the BaseWidget
 // Minimum parameters provided.
-//   The amount to shrink the image (provides a boarder)
-//	 The image. This should be the clock face
-//   W and H used to set the minimum Width and Height of the widget
+//   imageShrink: The amount to shrink the image (provides a boarder)
+//	 image: The clock face image.
+//   W, H: Are used to set the minimum Width and Height of the widget
+//   running: Will start the clock if true.
+//       Use SetRunning(b bool) to start or stop the clock after it is created
 //
-func NewWidgetClock(imageShrink float32, image *canvas.Image, W, H float32) *WidgetClock {
+func NewWidgetClock(imageShrink float32, image *canvas.Image, W, H float32, running bool) *WidgetClock {
 	w := &WidgetClock{
-		minSize:     fyne.Size{Width: W, Height: H},
 		ImageShrink: imageShrink,
 		Image:       image,
+		minSize:     fyne.Size{Width: W, Height: H},
+		running:     running,
 		// Define the default values other properties
-		running:         false,
 		MHandColor:      theme.PrimaryColorNamed("green"),
 		SHandColor:      theme.PrimaryColorNamed("red"),
 		HHandColor:      theme.PrimaryColorNamed("blue"),
@@ -264,7 +277,7 @@ func NewWidgetClock(imageShrink float32, image *canvas.Image, W, H float32) *Wid
 // Part of the widget interface. Provided a reference to the Renderer
 // Do not hang on to the reference to the Renderer. fyne may stop using
 // it and call again for a new one. fyne also caches the reference.
-// The Renderer gets the widget state from a passed in reference to the widget.
+// The Renderer gets the widget state passed in as a reference.
 //
 func (w *WidgetClock) CreateRenderer() fyne.WidgetRenderer {
 	return newWidgetClockRenderer(w)
@@ -272,8 +285,8 @@ func (w *WidgetClock) CreateRenderer() fyne.WidgetRenderer {
 
 //
 // Start (true) or Stop (false) the clock hands.
-// The cock hands are always updated (in case the widget is resized)
-// This flag just freezes the time by stopping the Renderer calling updateTime()
+// The clock hands are always updated (in case the widget is resized)
+// This flag just freezes their positions by stopping the Renderer calling updateTime()
 //
 func (w *WidgetClock) SetRunning(b bool) {
 	w.running = b
@@ -301,10 +314,18 @@ func (w *WidgetClock) Resize(s fyne.Size) {
 	w.BaseWidget.Resize(s)
 }
 
+//
+// From the fyne.SecondaryTappable interface
+//   Will be called if the clock face is (right) clicked
+//
 func (w *WidgetClock) TappedSecondary(pe *fyne.PointEvent) {
 	fmt.Println("TappedSecondary")
 }
 
+//
+// From the fyne.Tappable interface
+//   Will be called if the clock face is (left) clicked
+//
 func (w *WidgetClock) Tapped(pe *fyne.PointEvent) {
 	fmt.Println("Tapped")
 }
