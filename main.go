@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -8,7 +9,8 @@ import (
 )
 
 func main() {
-	ShowWidgetClockInContainer()
+	ShowWidgetAnimator()
+	//	ShowWidgetClockInContainer()
 }
 
 func ShowWidgetClockInContainer() {
@@ -26,5 +28,14 @@ func ShowWidgetClock() {
 	aWindow := app.NewWindow("Widget Clock")
 	clock := NewWidgetClock(10, canvas.NewImageFromFile("clock2.svg"), 100, 100, true)
 	aWindow.SetContent(clock)
+	aWindow.ShowAndRun()
+}
+
+func ShowWidgetAnimator() {
+	var wa *WidgetAnimate
+	app := app.New()
+	aWindow := app.NewWindow("Widget Animator")
+	wa = NewWidgetAnimate(50, 50, func(pe *fyne.PointEvent) {})
+	aWindow.SetContent(wa)
 	aWindow.ShowAndRun()
 }
