@@ -45,11 +45,13 @@ See source code comments for details.
 
 ## WidgetAnimator
 
-This widget displays a simple circle in a rectangle. When the widget is clicked the circle animates. It shrinks and then expands to th original size.
+This widget displays a simple circle in a rectangle. When the widget is clicked the circle animates. It shrinks and then expands to the original size.
 
 This is an example of the use of the fyne.Animation and a fyne.WidgetRenderer combined to animate a simple button like widget and can be used as a starting point for more creative widgets of your own.
 
+![Screenshot from 2021-11-25 17-50-39](https://user-images.githubusercontent.com/94919638/143485360-e7962123-d8f8-4b2c-9ab0-62f1aefbb9cd.png)
 
+See source code comments for details.
 
 
 
