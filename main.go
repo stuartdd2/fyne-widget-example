@@ -23,6 +23,7 @@ func ShowWidgetClockInContainer() {
 	aWindow.SetContent(container.NewBorder(aButton, nil, nil, nil, clock))
 	aWindow.ShowAndRun()
 }
+
 func ShowWidgetClock() {
 	app := app.New()
 	aWindow := app.NewWindow("Widget Clock")
