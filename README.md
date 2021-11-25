@@ -42,3 +42,14 @@ func main() {
 ```
 
 See source code comments for details.
+
+## WidgetAnimator
+
+This widget displays a simple circle in a rectangle. When the widget is clicked the circle animates. It shrinks and then expands to th original size.
+
+This is an example of the use of the fyne.Animation and a fyne.WidgetRenderer combined to animate a simple button like widget and can be used as a starting point for more creative widgets of your own.
+
+
+
+
+
