@@ -9,6 +9,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+//
+
 var _ fyne.WidgetRenderer = (*widgetAnimateRenderer)(nil)
 var _ fyne.CanvasObject = (*WidgetAnimate)(nil)
 var _ fyne.Widget = (*WidgetAnimate)(nil)
