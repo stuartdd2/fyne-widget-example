@@ -1,4 +1,4 @@
-module stuartdd/widget_tests
+module github.com/stuartdd2/fyne-widget-example
 
 go 1.17
 
