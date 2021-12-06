@@ -9,14 +9,21 @@ import (
 )
 
 func main() {
-	ShowWidgetAnimator()
+	ShowWidgetTutorial()
 	//	ShowWidgetClockInContainer()
+}
+func ShowWidgetTutorial() {
+	app := app.New()
+	w := app.NewWindow("My Widget")
+	mw := NewMyWidget("Widget")
+	w.SetContent(mw)
+	w.ShowAndRun()
 }
 
 func ShowWidgetClockInContainer() {
 	app := app.New()
 	aWindow := app.NewWindow("Widget Clock")
-	clock := NewWidgetClock(10, canvas.NewImageFromFile("clock2.svg"), 100, 100, true)
+	clock := NewWidgetClock(100, 100, 10, canvas.NewImageFromFile("clock2.svg"), true)
 	aButton := widget.NewButton("Stop/Start", func() {
 		clock.SetRunning(!clock.GetRunning())
 	})
@@ -27,7 +34,7 @@ func ShowWidgetClockInContainer() {
 func ShowWidgetClock() {
 	app := app.New()
 	aWindow := app.NewWindow("Widget Clock")
-	clock := NewWidgetClock(10, canvas.NewImageFromFile("clock2.svg"), 100, 100, true)
+	clock := NewWidgetClock(100, 100, 10, canvas.NewImageFromFile("clock2.svg"), true)
 	aWindow.SetContent(clock)
 	aWindow.ShowAndRun()
 }

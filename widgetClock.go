@@ -256,7 +256,7 @@ type WidgetClock struct {
 //   running: Will start the clock if true.
 //       Use SetRunning(b bool) to start or stop the clock after it is created
 //
-func NewWidgetClock(imageShrink float32, image *canvas.Image, W, H float32, running bool) *WidgetClock {
+func NewWidgetClock(W, H, imageShrink float32, image *canvas.Image, running bool) *WidgetClock {
 	w := &WidgetClock{
 		ImageShrink: imageShrink,
 		Image:       image,
