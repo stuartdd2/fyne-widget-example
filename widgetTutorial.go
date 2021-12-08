@@ -31,25 +31,20 @@ func (r *myWidgetRenderer) Refresh() {
 }
 
 func (r *myWidgetRenderer) Layout(s fyne.Size) {
-	si := r.MinSize()
-	r.text.Move(fyne.Position{X: (s.Width - si.Width) / 2, Y: (s.Height - si.Height) / 2})
+	ts := fyne.MeasureText(r.text.Text, r.text.TextSize, r.text.TextStyle)
+	r.text.Move(fyne.Position{X: (s.Width - ts.Width) / 2, Y: (s.Height - ts.Height) / 2})
 	r.rect.Resize(s)
 }
 
 func (r *myWidgetRenderer) MinSize() fyne.Size {
-	return fyne.MeasureText(r.text.Text, r.text.TextSize, r.text.TextStyle)
+	ts := fyne.MeasureText(r.text.Text, r.text.TextSize, r.text.TextStyle)
+	return fyne.NewSize(ts.Width+20, ts.Height+20)
 }
 
 func (r *myWidgetRenderer) Objects() []fyne.CanvasObject {
 	return []fyne.CanvasObject{r.rect, r.text}
 }
 
-//
-// From the WidgetRenderer interface.
-// Called when the rendered is destroyed and the memory released.
-//  This is where you clean up your mess!
-//  Nothing to do at the moment!
-//
 func (r *myWidgetRenderer) Destroy() {}
 
 type MyWidget struct {
@@ -68,12 +63,6 @@ func NewMyWidget(text string) *MyWidget {
 	return w
 }
 
-//
-// Part of the widget interface. Provided a reference to the Renderer
-// Do not hang on to the reference to the Renderer. fyne may stop using
-// it and call again for a new one. fyne also caches the reference.
-// The Renderer gets the widget state passed in as a reference.
-//
 func (w *MyWidget) CreateRenderer() fyne.WidgetRenderer {
 	return newMyWidgetRenderer(w)
 }
