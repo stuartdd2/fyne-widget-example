@@ -7,7 +7,8 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-// ------------------ Widget code starts here
+//
+// Widget code starts here
 //
 // A text widget with theamed background and foreground
 //
@@ -36,20 +37,10 @@ func (w *MyWidget) CreateRenderer() fyne.WidgetRenderer {
 }
 
 //
-// Change the text and refresh the widget display
+// Widget Renderer code starts here
 //
-func (w *MyWidget) SetText(text string) {
-	w.text = text
-	w.Refresh()
-}
-
-//
-// ------------------ Widget Renderer code starts here
-//
-var _ fyne.WidgetRenderer = (*myWidgetRenderer)(nil) // Test myWidgetRenderer is a fyne.fyne.WidgetRenderer
-
 type myWidgetRenderer struct {
-	widget     *MyWidget         // Reference to rthe widget holding the current state
+	widget     *MyWidget         // Reference to the widget holding the current state
 	background *canvas.Rectangle // A background rectangle
 	text       *canvas.Text      // The text
 }
@@ -57,7 +48,8 @@ type myWidgetRenderer struct {
 //
 // Create the renderer with a reference to the widget
 // Note: The background and foreground colours are set from the current theme.
-// 		 Do not size or move widget here.
+//
+// Do not size or move canvas objects here.
 //
 func newMyWidgetRenderer(myWidget *MyWidget) *myWidgetRenderer {
 	return &myWidgetRenderer{
@@ -68,8 +60,9 @@ func newMyWidgetRenderer(myWidget *MyWidget) *myWidgetRenderer {
 }
 
 //
-// If the state of the widget changes or the theme is changed
-// the Refresh() method is called.
+// The Refresh() method is called if the state of the widget changes or the
+// theme is changed
+//
 // Note: The background and foreground colours are set from the current theme
 //
 func (r *myWidgetRenderer) Refresh() {
@@ -81,8 +74,8 @@ func (r *myWidgetRenderer) Refresh() {
 }
 
 //
-// Given the size required by the fyne application.
-//    Move and size the canvas items.
+// Given the size required by the fyne application move and re-size the
+// canvas objects.
 //
 func (r *myWidgetRenderer) Layout(s fyne.Size) {
 	// Measure the size of the text so we can calculate the center offset.
@@ -95,17 +88,17 @@ func (r *myWidgetRenderer) Layout(s fyne.Size) {
 
 //
 // Create a minimum size for the widget.
-// The smallest size is the size of the text with a 20.0 width border
+// The smallest size is the size of the text with a border defined by the theme padding
 //
 func (r *myWidgetRenderer) MinSize() fyne.Size {
-	// Measure the size of the text so we can calculate decide on an border size.
+	// Measure the size of the text so we can calculate a border size.
 	ts := fyne.MeasureText(r.text.Text, r.text.TextSize, r.text.TextStyle)
-	// Reyturn the size of the text plus a border
-	return fyne.NewSize(ts.Width+20, ts.Height+20)
+	// Use the theme padding to set a border size
+	return fyne.NewSize(ts.Width+theme.Padding()*4, ts.Height+theme.Padding()*4)
 }
 
 //
-// Return a list of each canvas (to be drawn) object.
+// Return a list of each canvas object.
 //
 func (r *myWidgetRenderer) Objects() []fyne.CanvasObject {
 	return []fyne.CanvasObject{r.background, r.text}
